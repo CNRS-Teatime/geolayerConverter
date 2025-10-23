@@ -1,5 +1,55 @@
 import fs from 'fs';
 import { parse } from 'csv-parse';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
+
+
+const optionDefinitions = [
+  {
+    name: "help",
+    alias: "h",
+    type: Boolean,
+    description: "Display this usage guide."
+  },
+  {
+    name: 'vertices',
+    type: String,
+    description: 'Path to CSV vertices file'
+  },
+  {
+    name: 'faces',
+    type: String,
+    description: 'Path to CSV faces file'
+  },
+  {
+    name: 'output',
+    type: String,
+    description: 'Optional. Path to output PLY file.'
+  }
+]
+
+const options = commandLineArgs(optionDefinitions);
+const usage = commandLineUsage([
+  {
+    header: 'An app to build a PLY file from CSVs.',
+    content: 'This app aims to build a PLY file from two CSV files (one for vertices, the other with faces). Example: node app.js --vertices "./data/vertices.csv" --faces "./data/faces.csv" --output "./results.ply"'
+  },
+  {
+    header: 'Options',
+    optionList: optionDefinitions
+  },
+  {
+    content: 'Project home: {underline https://github.com/Teatime/geolayerConverter}'
+  }
+]);
+
+// if no arg, display usage guide (by default, are test (multithesaurus inclusion, homonymy, thesauri/aioli inclusion) are set on false)
+if (options.help || (!options.vertices && !options.faces)){
+  console.log(usage);
+}
+else {
+  main(options.vertices, options.faces, options.output);
+}
 
 // Fonction pour lire un fichier CSV et retourner une promesse
 function readCSV(filePath) {
@@ -20,19 +70,23 @@ function readCSV(filePath) {
 }
 
 // Fonction principale
-async function main() {
+async function main(verticesPath, facesPath, outputPath="./data/output.ply") {
+  console.log(verticesPath);
+  console.log(facesPath);
+  console.log(outputPath);
+
   try {
     // Lecture parallèle des deux fichiers
     const [vertices, faces] = await Promise.all([
-      readCSV('./data/mon_fichier_vertice_sim20250313_a_0.csv'),
-      readCSV('./data/mon_fichier_sim20250313_a_0.csv')
+      readCSV(verticesPath),
+      readCSV(facesPath)
     ]);
 
     // Appel de la fonction de traitement
     const plyContent = buildPLY(vertices, faces);
 
     // Écriture du fichier
-    fs.writeFileSync('./data/output.ply', plyContent, 'utf8');
+    fs.writeFileSync(outputPath, plyContent, 'utf8');
     console.log('Fichier output.ply généré avec succès !');
 
   } catch (error) {
@@ -44,7 +98,7 @@ async function main() {
 function buildPLY(vertices, faces) {
   console.log('Nombre de vertices :', vertices.length);
   console.log('Nombre de faces :', faces.length);
-  
+
   let header = `ply
   format ascii 1.0
   element vertex ${vertices.length}
@@ -68,5 +122,3 @@ function buildPLY(vertices, faces) {
   // on asssemble le tout
   return [header, ...vertexLines, ...faceLines].join('\n');
 }
-
-main();
