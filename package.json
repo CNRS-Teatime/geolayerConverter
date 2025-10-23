@@ -1,0 +1,16 @@
+{
+  "name":"geolayerConverter",
+  "version": "1.0",
+  "description": "convert csv files with vertices and faces in PLY ascii",
+  "author": "Violette Abergel",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "command-line-args": "^6.0.0",
+    "command-line-usage": "^7.0.2",
+    "commander": "^12.1.0",
+    "csv-parse": "^5.5.0"
+  }
+}
