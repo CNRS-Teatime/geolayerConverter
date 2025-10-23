@@ -39,7 +39,7 @@ const usage = commandLineUsage([
     optionList: optionDefinitions
   },
   {
-    content: 'Project home: {underline https://github.com/Teatime/geolayerConverter}'
+    content: 'Project home: {underline https://github.com/CNRS-Teatime/geolayerConverter/}'
   }
 ]);
 
